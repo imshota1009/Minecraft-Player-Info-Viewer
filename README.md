@@ -35,7 +35,30 @@
 
 ## 🚀 使い方 (How To Use)
 
-1. このリポジトリをクローンする:
-   ```sh
-   git clone https://github.com/yourusername/minecraft-player-info-viewer.git
-   cd minecraft-player-info-viewer
+1. 下記のURLをクリック  
+   👉 [Minecraft Player Info Viewer](https://imshota1009.github.io/Minecraft-Player-Info-Viewer/)  
+2. 検索したい **Minecraftプレイヤー名** を入力して検索  
+
+---
+
+## 🛠️ 使用技術 (Technologies Used)
+
+- **HTML5**: 基本構造  
+- **Tailwind CSS**: UI / スタイリング  
+- **JavaScript (ES6+)**: ロジック処理  
+- **Mojang API**: プレイヤーデータ取得  
+- **Crafatar API**: スキン表示 & ダウンロード  
+
+---
+
+## 🌍 API 参考リンク
+
+- [Mojang API](https://mojang.com/)  
+- [Crafatar](https://crafatar.com/)  
+
+---
+
+## 🎮 最後に
+
+友達のIDを検索して、スキンをダウンロードしてみましょう！  
+あなたのマイクラ生活が、ちょっと便利で楽しくなるかも…？ ⛏️✨  
