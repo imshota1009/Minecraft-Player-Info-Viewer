@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Player Info Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* マインクラフトの世界観に合わせたカスタムスタイル */
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #1a202c;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 80% 90%, rgba(74, 222, 128, 0.1) 0%, transparent 30%);
+            color: #e2e8f0;
+        }
+
+        .font-minecraft {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* カードのスタイル */
+        .player-card {
+            background: rgba(23, 30, 44, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ローディングスピナー */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #22c55e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 成功チェックマークのアニメーション */
+        .success-checkmark__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #4ade80; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+        .success-checkmark__check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        
+        /* 失敗バツマークのアニメーション */
+        .error-xmark__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #ef4444; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+        .error-xmark__line { stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 3; stroke-miterlimit: 10; stroke: #ef4444; fill: none; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+        .error-xmark__line.first { transform-origin: 50% 50%; transform: rotate(45deg); }
+        .error-xmark__line.second { transform-origin: 50% 50%; transform: rotate(-45deg); }
+
+
+        /* スキンレンダリングのスタイル */
+        .skin-render-container { min-height: 300px; }
+        .skin-render { width: 150px; height: 300px; image-rendering: pixelated; /* ピクセル感を維持 */ }
+        .head-render { width: 150px; height: 150px; image-rendering: pixelated; margin-top: 75px; margin-bottom: 75px; }
+
+        /* コピーアイコンのフィードバック用 */
+        .copy-feedback {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #22c55e;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-minecraft text-green-400 drop-shadow-[0_3px_3px_rgba(0,0,0,0.6)]">Minecraft</h1>
+            <p class="text-lg md:text-xl font-minecraft text-gray-300 mt-2">Player Info Viewer</p>
+        </header>
+
+        <form id="search-form" class="mb-8">
+            <div class="flex items-center bg-gray-800 border-2 border-gray-600 rounded-md overflow-hidden shadow-lg">
+                <input
+                    type="text"
+                    id="username-input"
+                    placeholder="マインクラフトIDを入力..."
+                    class="w-full bg-transparent p-4 text-gray-200 focus:outline-none placeholder-gray-500"
+                    required
+                >
+                <button
+                    type="submit"
+                    class="bg-green-600 hover:bg-green-500 text-white font-bold py-4 px-6 transition-colors duration-300"
+                >
+                    検索
+                </button>
+            </div>
+        </form>
+
+        <div id="result-container">
+            <div id="initial-message" class="text-center text-gray-400">
+                <p>プレイヤー名を入力して、スキンや情報を表示します。</p>
+            </div>
+            <div id="status-indicator" class="hidden justify-center items-center py-4 h-[72px]">
+                <div id="loader" class="loader"></div>
+                <div id="success-icon" class="hidden">
+                    <svg class="w-16 h-16" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="success-checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="success-checkmark__check" fill="none" stroke="#4ade80" stroke-width="3" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                </div>
+                <div id="error-icon" class="hidden">
+                    <svg class="w-16 h-16" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="error-xmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="error-xmark__line first" fill="none" stroke="#ef4444" stroke-width="3" d="M16 16 36 36"/>
+                        <path class="error-xmark__line second" fill="none" stroke="#ef4444" stroke-width="3" d="M36 16 16 36"/>
+                    </svg>
+                </div>
+            </div>
+            <div id="error-message" class="hidden text-center bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg flex items-center justify-center gap-2">
+                </div>
+            <div id="player-card" class="hidden"></div>
+        </div>
+
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>Powered by the <a href="https://mojang.com/" target="_blank" class="text-green-400 hover:underline">Mojang API</a> & <a href="https://crafatar.com/" target="_blank" class="text-green-400 hover:underline">Crafatar</a>.</p>
+        </footer>
+    </div>
+
+    <script>
+        const searchForm = document.getElementById('search-form');
+        const usernameInput = document.getElementById('username-input');
+        const initialMessage = document.getElementById('initial-message');
+        const statusIndicator = document.getElementById('status-indicator');
+        const loader = document.getElementById('loader');
+        const successIcon = document.getElementById('success-icon');
+        const errorIcon = document.getElementById('error-icon'); // ★★★追加★★★
+        const errorMessage = document.getElementById('error-message');
+        const playerCard = document.getElementById('player-card');
+
+        // ===================================================
+        // 検索処理
+        // ===================================================
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            if (!username) return;
+
+            // 各要素の状態をリセット
+            initialMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            playerCard.classList.add('hidden');
+            successIcon.classList.add('hidden');
+            errorIcon.classList.add('hidden'); // ★★★追加★★★
+            loader.classList.remove('hidden');
+            statusIndicator.classList.remove('hidden');
+            statusIndicator.style.display = 'flex'; 
+
+            try {
+                const targetUrl = `https://api.mojang.com/users/profiles/minecraft/${username}`;
+                const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`);
+                const responseText = await response.text();
+
+                if (responseText.trim() === '') {
+                    throw new Error('そのような名前のプレイヤーは存在しません');
+                }
+                
+                const playerData = JSON.parse(responseText);
+
+                if (!playerData || !playerData.id) {
+                    throw new Error('そのような名前のプレイヤーは存在しません');
+                }
+
+                loader.classList.add('hidden');
+                successIcon.classList.remove('hidden'); // 成功アイコンを表示
+
+                // 成功時は少し待ってからカードを表示
+                setTimeout(() => {
+                    statusIndicator.classList.add('hidden');
+                    displayPlayerData(playerData);
+                }, 1200);
+
+            } catch (error) {
+                // エラー時はローディングと成功アイコンを隠し、エラーアイコンとメッセージを表示
+                loader.classList.add('hidden');
+                successIcon.classList.add('hidden');
+                errorIcon.classList.remove('hidden'); // ★★★追加★★★
+                
+                // エラーアイコン表示のため、少し遅延させてからメッセージを表示
+                setTimeout(() => {
+                    statusIndicator.classList.add('hidden'); // ★★★修正: アイコンが表示されたらstatusIndicatorを隠す★★★
+                    showError(error.message);
+                }, 1200); // アイコンのアニメーションと同じ時間
+            }
+        });
+        
+        function showError(message) {
+            errorMessage.innerHTML = `<span class="text-red-300">${message}</span>`; // ★★★修正: SVGはHTML側に定義するため、テキストのみを挿入★★★
+            errorMessage.classList.remove('hidden');
+        }
+
+        // ===================================================
+        // ワンクリックコピー
+        // ===================================================
+        const copyToClipboard = (text, element) => {
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = element.querySelector('.copy-feedback');
+                if (feedback) {
+                    feedback.style.opacity = '1';
+                    setTimeout(() => {
+                        feedback.style.opacity = '0';
+                    }, 1500);
+                }
+            });
+        };
+
+        // ===================================================
+        // プレイヤーカードの表示
+        // ===================================================
+        function displayPlayerData(data) {
+            const cardHtml = `
+                <div class="player-card rounded-lg p-6 shadow-2xl">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="flex items-center gap-4 w-full">
+                            <img src="https://crafatar.com/avatars/${data.id}?size=64&overlay" alt="${data.name}'s avatar" class="rounded-md border-2 border-gray-600" style="image-rendering: pixelated;">
+                            <div class="flex-grow min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-2xl font-bold truncate">${data.name}</h2>
+                                    <button class="copy-btn relative flex-shrink-0" data-copy-text="${data.name}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                                        <span class="copy-feedback">Copied!</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-xs text-gray-400 break-all">${data.id}</p>
+                                    <button class="copy-btn relative flex-shrink-0" data-copy-text="${data.id}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-white" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                                        <span class="copy-feedback">Copied!</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full flex justify-center bg-black/20 rounded-lg p-4 skin-render-container">
+                            <img id="skin-render-img" src="https://crafatar.com/renders/body/${data.id}?overlay" class="skin-render" alt="${data.name}'s skin render">
+                        </div>
+
+                        <div class="flex gap-2 w-full">
+                            <button class="render-btn flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300" data-render-type="body">全身</button>
+                            <button class="render-btn flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300" data-render-type="head">頭部</button>
+                        </div>
+                        
+                        <a href="https://crafatar.com/skins/${data.id}" target="_blank" rel="noopener noreferrer"
+                           class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-md text-center transition-colors duration-300">
+                           スキンをダウンロード
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            playerCard.innerHTML = cardHtml;
+            playerCard.classList.remove('hidden');
+
+            // --- イベントリスナーの追加 ---
+            // コピーボタン
+            playerCard.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', () => copyToClipboard(button.dataset.copyText, button));
+            });
+
+            // レンダリング切り替えボタン
+            const renderImage = document.getElementById('skin-render-img');
+            playerCard.querySelectorAll('.render-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const renderType = button.dataset.renderType;
+                    renderImage.src = `https://crafatar.com/renders/${renderType}/${data.id}?overlay`;
+                    renderImage.className = renderType === 'body' ? 'skin-render' : 'head-render';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
