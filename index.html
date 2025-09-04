@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* マインクラフトの世界観に合わせたカスタムスタイル */
+        /* Custom styles inspired by Minecraft's aesthetic */
         body {
-            font-family: 'Noto Sans JP', sans-serif;
+            font-family: 'Noto Sans', sans-serif;
             background-color: #1a202c;
             background-image:
                 radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.1) 0%, transparent 30%),
@@ -23,7 +23,7 @@
             font-family: 'Press Start 2P', cursive;
         }
 
-        /* カードのスタイル */
+        /* Card style */
         .player-card {
             background: rgba(23, 30, 44, 0.7);
             backdrop-filter: blur(10px);
@@ -35,7 +35,7 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* ローディングスピナー */
+        /* Loading spinner */
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #22c55e;
@@ -50,24 +50,24 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 成功チェックマークのアニメーション */
+        /* Success checkmark animation */
         .success-checkmark__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #4ade80; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         .success-checkmark__check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
         
-        /* 失敗バツマークのアニメーション */
+        /* Error X-mark animation */
         .error-xmark__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #ef4444; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         .error-xmark__line { stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 3; stroke-miterlimit: 10; stroke: #ef4444; fill: none; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
         .error-xmark__line.first { transform-origin: 50% 50%; transform: rotate(45deg); }
         .error-xmark__line.second { transform-origin: 50% 50%; transform: rotate(-45deg); }
 
 
-        /* スキンレンダリングのスタイル */
+        /* Skin rendering styles */
         .skin-render-container { min-height: 300px; }
-        .skin-render { width: 150px; height: 300px; image-rendering: pixelated; /* ピクセル感を維持 */ }
+        .skin-render { width: 150px; height: 300px; image-rendering: pixelated; /* Maintain pixelated look */ }
         .head-render { width: 150px; height: 150px; image-rendering: pixelated; margin-top: 75px; margin-bottom: 75px; }
 
-        /* コピーアイコンのフィードバック用 */
+        /* For copy icon feedback */
         .copy-feedback {
             position: absolute;
             top: -25px;
@@ -96,7 +96,7 @@
                 <input
                     type="text"
                     id="username-input"
-                    placeholder="マインクラフトIDを入力..."
+                    placeholder="Enter Minecraft ID..."
                     class="w-full bg-transparent p-4 text-gray-200 focus:outline-none placeholder-gray-500"
                     required
                 >
@@ -104,14 +104,14 @@
                     type="submit"
                     class="bg-green-600 hover:bg-green-500 text-white font-bold py-4 px-6 transition-colors duration-300"
                 >
-                    検索
+                    Search
                 </button>
             </div>
         </form>
 
         <div id="result-container">
             <div id="initial-message" class="text-center text-gray-400">
-                <p>プレイヤー名を入力して、スキンや情報を表示します。</p>
+                <p>Enter a player name to display their skin and info.</p>
             </div>
             <div id="status-indicator" class="hidden justify-center items-center py-4 h-[72px]">
                 <div id="loader" class="loader"></div>
@@ -130,7 +130,7 @@
                 </div>
             </div>
             <div id="error-message" class="hidden text-center bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg flex items-center justify-center gap-2">
-                </div>
+            </div>
             <div id="player-card" class="hidden"></div>
         </div>
 
@@ -146,73 +146,74 @@
         const statusIndicator = document.getElementById('status-indicator');
         const loader = document.getElementById('loader');
         const successIcon = document.getElementById('success-icon');
-        const errorIcon = document.getElementById('error-icon'); // ★★★追加★★★
+        const errorIcon = document.getElementById('error-icon');
         const errorMessage = document.getElementById('error-message');
         const playerCard = document.getElementById('player-card');
 
         // ===================================================
-        // 検索処理
+        // Search Handling
         // ===================================================
         searchForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = usernameInput.value.trim();
             if (!username) return;
 
-            // 各要素の状態をリセット
+            // Reset the state of all elements
             initialMessage.classList.add('hidden');
             errorMessage.classList.add('hidden');
             playerCard.classList.add('hidden');
             successIcon.classList.add('hidden');
-            errorIcon.classList.add('hidden'); // ★★★追加★★★
+            errorIcon.classList.add('hidden');
             loader.classList.remove('hidden');
             statusIndicator.classList.remove('hidden');
             statusIndicator.style.display = 'flex'; 
 
             try {
+                // Using a CORS proxy to bypass browser restrictions
                 const targetUrl = `https://api.mojang.com/users/profiles/minecraft/${username}`;
                 const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`);
                 const responseText = await response.text();
 
                 if (responseText.trim() === '') {
-                    throw new Error('そのような名前のプレイヤーは存在しません');
+                    throw new Error('A player with that name does not exist');
                 }
                 
                 const playerData = JSON.parse(responseText);
 
                 if (!playerData || !playerData.id) {
-                    throw new Error('そのような名前のプレイヤーは存在しません');
+                    throw new Error('A player with that name does not exist');
                 }
 
                 loader.classList.add('hidden');
-                successIcon.classList.remove('hidden'); // 成功アイコンを表示
+                successIcon.classList.remove('hidden'); // Show success icon
 
-                // 成功時は少し待ってからカードを表示
+                // On success, wait a bit before showing the card
                 setTimeout(() => {
                     statusIndicator.classList.add('hidden');
                     displayPlayerData(playerData);
                 }, 1200);
 
             } catch (error) {
-                // エラー時はローディングと成功アイコンを隠し、エラーアイコンとメッセージを表示
+                // On error, hide loader/success and show error icon/message
                 loader.classList.add('hidden');
                 successIcon.classList.add('hidden');
-                errorIcon.classList.remove('hidden'); // ★★★追加★★★
+                errorIcon.classList.remove('hidden');
                 
-                // エラーアイコン表示のため、少し遅延させてからメッセージを表示
+                // Add a small delay to show the error icon animation before the message
                 setTimeout(() => {
-                    statusIndicator.classList.add('hidden'); // ★★★修正: アイコンが表示されたらstatusIndicatorを隠す★★★
+                    statusIndicator.classList.add('hidden');
                     showError(error.message);
-                }, 1200); // アイコンのアニメーションと同じ時間
+                }, 1200); // Same duration as the icon animation
             }
         });
         
         function showError(message) {
-            errorMessage.innerHTML = `<span class="text-red-300">${message}</span>`; // ★★★修正: SVGはHTML側に定義するため、テキストのみを挿入★★★
+            errorMessage.innerHTML = `<span class="text-red-300">${message}</span>`;
             errorMessage.classList.remove('hidden');
         }
 
         // ===================================================
-        // ワンクリックコピー
+        // One-Click Copy
         // ===================================================
         const copyToClipboard = (text, element) => {
             navigator.clipboard.writeText(text).then(() => {
@@ -227,7 +228,7 @@
         };
 
         // ===================================================
-        // プレイヤーカードの表示
+        // Display Player Card
         // ===================================================
         function displayPlayerData(data) {
             const cardHtml = `
@@ -258,13 +259,13 @@
                         </div>
 
                         <div class="flex gap-2 w-full">
-                            <button class="render-btn flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300" data-render-type="body">全身</button>
-                            <button class="render-btn flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300" data-render-type="head">頭部</button>
+                            <button class="render-btn flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300" data-render-type="body">Full Body</button>
+                            <button class="render-btn flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300" data-render-type="head">Head</button>
                         </div>
                         
                         <a href="https://crafatar.com/skins/${data.id}" target="_blank" rel="noopener noreferrer"
                            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-md text-center transition-colors duration-300">
-                           スキンをダウンロード
+                           Download Skin
                         </a>
                     </div>
                 </div>
@@ -273,13 +274,13 @@
             playerCard.innerHTML = cardHtml;
             playerCard.classList.remove('hidden');
 
-            // --- イベントリスナーの追加 ---
-            // コピーボタン
+            // --- Add event listeners ---
+            // Copy buttons
             playerCard.querySelectorAll('.copy-btn').forEach(button => {
                 button.addEventListener('click', () => copyToClipboard(button.dataset.copyText, button));
             });
 
-            // レンダリング切り替えボタン
+            // Render toggle buttons
             const renderImage = document.getElementById('skin-render-img');
             playerCard.querySelectorAll('.render-btn').forEach(button => {
                 button.addEventListener('click', () => {
@@ -292,3 +293,5 @@
     </script>
 </body>
 </html>
+
+
