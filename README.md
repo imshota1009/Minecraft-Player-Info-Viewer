@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<p><strong>マインクラフトIDを入力するだけで、プレイヤーのUUIDやスキンを取得・表示できるWebアプリ！</strong></p>
+<p><strong>A web app that lets you fetch and display a player's UUID and skin by simply entering their Minecraft ID!</strong></p>
 
 <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
 <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
@@ -12,53 +12,54 @@
 
 ---
 
-## 🎮 アプリの概要 (About)
+## 🎮 About
 
-`Minecraft Player Info Viewer` は、ユーザーが入力した **Minecraft ID** から、  
-**UUID・スキンのプレビュー・ダウンロード** を簡単に確認できるツールです。  
+`Minecraft Player Info Viewer` is a simple tool that allows you to easily check  
+a player's **UUID, skin preview, and download** just by entering their **Minecraft ID**.  
 
-- Mojang API を利用してプレイヤー情報を取得  
-- Crafatar API を利用してスキンを表示・ダウンロード  
-
----
-
-## ✨ 主な機能 (Features)
-
-- 🔍 **ID検索**: プレイヤー名を入力するだけでUUIDとスキンを取得  
-- 👤 **スキン表示**: 全身 / 頭部レンダリングを切り替え可能  
-- 📋 **ワンクリックコピー**: プレイヤー名・UUIDを即コピー  
-- 📥 **スキンダウンロード**: オリジナルスキンをダウンロード可能  
-- 🎨 **美しいUI**: Tailwind CSS & ピクセルフォントでマイクラ風デザイン  
-- ⚡ **アニメーション**: 読み込み中はスピナー、成功時はチェックマーク、失敗時はバツアイコンを表示  
+- Fetches player info using the Mojang API  
+- Displays and downloads skins via the Crafatar API  
 
 ---
 
-## 🚀 使い方 (How To Use)
+## ✨ Features
 
-1. 下記のURLをクリック  
+- 🔍 **ID Search**: Enter a player name to instantly get their UUID and skin  
+- 👤 **Skin Preview**: Switch between full-body and head-only rendering  
+- 📋 **One-Click Copy**: Instantly copy player name and UUID  
+- 📥 **Skin Download**: Download the original skin with one click  
+- 🎨 **Beautiful UI**: Minecraft-style design with Tailwind CSS & pixel fonts  
+- ⚡ **Animations**: Spinner while loading, check mark on success, X icon on error  
+
+---
+
+## 🚀 How To Use
+
+1. Click the link below  
    👉 [Minecraft Player Info Viewer](https://imshota1009.github.io/Minecraft-Player-Info-Viewer/)  
-2. 検索したい **Minecraftプレイヤー名** を入力して検索  
+2. Enter the **Minecraft player name** you want to search for  
 
 ---
 
-## 🛠️ 使用技術 (Technologies Used)
+## 🛠️ Technologies Used
 
-- **HTML5**: 基本構造  
-- **Tailwind CSS**: UI / スタイリング  
-- **JavaScript (ES6+)**: ロジック処理  
-- **Mojang API**: プレイヤーデータ取得  
-- **Crafatar API**: スキン表示 & ダウンロード  
+- **HTML5**: Basic structure  
+- **Tailwind CSS**: UI / Styling  
+- **JavaScript (ES6+)**: Logic & functionality  
+- **Mojang API**: Fetch player data  
+- **Crafatar API**: Skin rendering & download  
 
 ---
 
-## 🌍 API 参考リンク
+## 🌍 API References
 
 - [Mojang API](https://mojang.com/)  
 - [Crafatar](https://crafatar.com/)  
 
 ---
 
-## 🎮 最後に
+## 🎮 Final Note
 
-友達のIDを検索して、スキンをダウンロードしてみましょう！  
-あなたのマイクラ生活が、ちょっと便利で楽しくなるかも…？ ⛏️✨  
+Try searching for your friends’ IDs and downloading their skins!  
+It might just make your Minecraft life a little more fun and convenient ⛏️✨  
+
