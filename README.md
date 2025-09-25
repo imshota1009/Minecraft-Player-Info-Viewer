@@ -36,7 +36,7 @@ a player's **UUID, skin preview, and download** just by entering their **Minecra
 ## 🚀 How To Use
 
 1. Click the link below  
-   👉 [Minecraft Player Info Viewer](https://imshota1009.github.io/Minecraft-Player-Info-Viewer/)  
+
 2. Enter the **Minecraft player name** you want to search for  
 
 ---
